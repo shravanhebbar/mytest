@@ -34,9 +34,8 @@ public class RestApiController {
 	public ResponseEntity<List<User>> listAllUsers() {
 		List<User> users = userService.findAllUsers();
 		if (users.isEmpty()) {
-			return new ResponseEntity(HttpStatus.NO_CONTENT);
-			// You many decide to return HttpStatus.NOT_FOUND
-		}
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+					}
 		return new ResponseEntity<List<User>>(users, HttpStatus.OK);
 	}
 
@@ -57,13 +56,14 @@ public class RestApiController {
 
 	// -------------------Create a User-------------------------------------------
 
-	@RequestMapping(value = "/user/", method = RequestMethod.POST)
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/user/{id}", method = RequestMethod.POST)
 	public ResponseEntity<?> createUser(@RequestBody User user, UriComponentsBuilder ucBuilder) {
 		logger.info("Creating User : {}", user);
 
 		if (userService.isUserExist(user)) {
 			logger.error("Unable to create. A User with name {} already exist", user.getName());
-			return new ResponseEntity(new CustomErrorType("Unable to create. A User with name " + 
+			return new ResponseEntity<Object>(new CustomErrorType("Unable to create. A User with name " + 
 			user.getName() + " already exist."),HttpStatus.CONFLICT);
 		}
 		userService.saveUser(user);
@@ -84,7 +84,7 @@ public class RestApiController {
 
 		if (currentUser == null) {
 			logger.error("Unable to update. User with id {} not found.", id);
-			return new ResponseEntity(new CustomErrorType("Unable to upate. User with id " + id + " not found."),
+			return new ResponseEntity<Object>(new CustomErrorType("Unable to upate. User with id " + id + " not found."),
 					HttpStatus.NOT_FOUND);
 		}
 
@@ -105,7 +105,7 @@ public class RestApiController {
 		User user = userService.findById(id);
 		if (user == null) {
 			logger.error("Unable to delete. User with id {} not found.", id);
-			return new ResponseEntity(new CustomErrorType("Unable to delete. User with id " + id + " not found."),
+			return new ResponseEntity<Object>(new CustomErrorType("Unable to delete. User with id " + id + " not found."),
 					HttpStatus.NOT_FOUND);
 		}
 		userService.deleteUserById(id);
